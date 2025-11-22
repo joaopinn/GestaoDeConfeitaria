@@ -1,17 +1,36 @@
-// models/Encomenda.js
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const EncomendaSchema = new mongoose.Schema({
-  nome: { type: String, required: true, unique: true },
-  descricao: { type: String },
-  precoVenda: { type: Number, required: true },
+  codigo: { type: Number, unique: true }, // Para gerar o #001, #002 (pode usar auto-increment)
+  
+  cliente: {
+    nome: { type: String, required: true },
+    telefone: { type: String, required: true }
+  },
+  
+  dataEntrega: { type: Date, required: true }, // Guarda data e hora juntos
+  
+  itens: [{
+    produto: { 
+      type: mongoose.Schema.Types.ObjectId, 
+      ref: 'Produto',
+      required: true
+    },
+    quantidade: { type: Number, default: 1, required: true },
+    precoUnitarioSnapshot: Number // Boa prática: salvar o preço no momento da venda
+  }],
+  
+  valorTotal: { type: Number, required: true },
+  
+  status: {
+    type: String,
+    enum: ['PENDENTE', 'EM_PRODUCAO', 'PRONTA', 'ENTREGUE', 'CANCELADA'],
+    default: 'PENDENTE'
+  },
+  
+  observacoes: String
+}, {
+  timestamps: true
+});
 
-  insumosNecessarios: [
-    {
-      insumo: { type: mongoose.Schema.Types.ObjectId, ref: "Insumo", required: true },
-      quantidade: { type: Number, required: true } // qtd usada para 1 unidade da encomenda
-    }
-  ]
-}, { timestamps: true });
-
-module.exports = mongoose.model("Encomenda", EncomendaSchema);
+module.exports = mongoose.model('Encomenda', EncomendaSchema);
