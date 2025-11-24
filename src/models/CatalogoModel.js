@@ -2,11 +2,11 @@ const mongoose = require('mongoose');
 
 const ProdutoSchema = new mongoose.Schema({
   nome: { type: String, required: true },
-  categoria: { type: String, required: true }, // Ex: "Bolos", "Tortas"
+  categoria: { type: String, required: true },
   descricao: String,
   
-  precoVenda: { type: Number, required: true }, // O Preço (R$ 120.00)
-  tempoPreparo: { type: Number, required: true }, // Em minutos (90)
+  precoVenda: { type: Number, required: true },
+  tempoPreparo: { type: Number, required: true },
   
   // A receita conecta o produto aos insumos
   receita: [{
@@ -18,21 +18,61 @@ const ProdutoSchema = new mongoose.Schema({
     quantidade: { 
       type: Number, 
       required: true 
-    } // Quanto gasta desse insumo (ex: 0.5 para 500g de farinha)
+    }
   }],
   
-  // Opcional: Salvar o custo fixo ou calcular dinamicamente
-  custoProducao: { type: Number, default: 0 } 
+  custoProducao: { type: Number, default: 0 },
+
+  // --- ADICIONADO PARA ATENDER O REQUISITO DO COLEGA ---
+  status: { 
+    type: String, 
+    enum: ['PENDENTE', 'ENTREGUE'], 
+    default: 'PENDENTE' 
+  }
+
 }, {
   timestamps: true,
   toJSON: { virtuals: true },
   toObject: { virtuals: true }
 });
 
-// Virtual: Calcula a margem automaticamente para o front (91.0%)
+// Método de calculo de Custo automático 
+ProdutoSchema.methods.calcularCusto = async function () {
+  // Vai no banco e pega os dados completos dos insumos
+  await this.populate('receita.insumo');
+
+  let custoTotal = 0;
+
+  // faz o loop somando os custos
+  this.receita.forEach(item => {
+    if (item.insumo) {
+      const insumo = item.insumo;
+
+      // Tenta usar o virtual do insumo
+      let custoPorUnidade = insumo.custoPorUnidadeBase;
+      
+      // Fallback de segurança: (Preço / Tamanho)
+      if(!custoPorUnidade) {
+        custoPorUnidade = insumo.precoCusto / insumo.tamanhoEmbalagem;
+      }
+
+      custoTotal += (custoPorUnidade * item.quantidade);
+    }
+  });
+
+  // CORRIGIDO: Removido o número 6 que estava aqui
+  this.custoProducao = parseFloat(custoTotal.toFixed(2));
+
+  return this.save(); 
+}
+
+
+// Virtual: Calcula a margem automaticamente
 ProdutoSchema.virtual('margemLucro').get(function() {
   if (!this.precoVenda || !this.custoProducao) return 0;
   return ((this.precoVenda - this.custoProducao) / this.precoVenda) * 100;
 });
 
+// OBSERVAÇÃO: O nome do model aqui é 'Produto'. 
+// Certifique-se que no EncomendaModel o ref seja: ref: 'Produto'
 module.exports = mongoose.model('Produto', ProdutoSchema);

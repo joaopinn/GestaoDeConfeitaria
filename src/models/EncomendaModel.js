@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const EncomendaSchema = new mongoose.Schema({
-  codigo: { type: Number, unique: true }, // Para gerar o #001, #002 (pode usar auto-increment)
+  codigo: { type: Number, unique: true }, // Para gerar o #001, #002 
   
   cliente: {
     nome: { type: String, required: true },

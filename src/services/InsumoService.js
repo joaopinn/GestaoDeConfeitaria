@@ -42,10 +42,10 @@ async function atualizarInsumoPorId (data, id){
     }
 }
 
-async function atualizarEstoqueDeInsumo(id, quantidadeEmEstoque) {
+async function atualizarEstoqueDeInsumo(id, estoqueAtual) {
 
     try {
-        const atualizacaoDoEstoque = Produto.findByIdAndUpdate(id, {quantidadeEmEstoque}, {
+        const atualizacaoDoEstoque = Produto.findByIdAndUpdate(id, {estoqueAtual}, {
             new: true,
             trueValidators: true
         })

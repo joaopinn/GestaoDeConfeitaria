@@ -6,12 +6,12 @@ const InsumoSchema = new mongoose.Schema({
   unidade: { type: String, required: true, enum: ['kg', 'g', 'l', 'ml', 'un'] }, // ex: 'kg', 'un', 'litro'
   // Dados para cálculo de custo
   precoCusto: { type: Number, default: 0 },
-  tamanhoEmbalagem: { type: Number, reqiure: true },
+  tamanhoEmbalagem: { type: Number, required: true },
 
   estoqueAtual: { type: Number, default: 0 },
   estoqueMinimo: { type: Number, default: 5 }, // Para avisar quando acabar
   
-  status: { type: String, enum: ['ATIVO', 'INATIVO'], default: 'ATIVO' }
+  status: { type: String, enum: ['PENDENTE', 'ENTREGUE'], default: 'PENDENTE' }
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 
