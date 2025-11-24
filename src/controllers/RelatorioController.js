@@ -14,14 +14,14 @@ async function gerarRelatorioController(req, res) {
 
         // Validação básica
         if (!tipo) {
-            return res.status(400).json({ 
-                error: 'Parâmetro "tipo" é obrigatório. Use "vendas", "produtos" ou "estoque".' 
+            return res.status(400).json({
+                error: 'Parâmetro "tipo" é obrigatório. Use "vendas", "produtos" ou "estoque".'
             });
         }
 
         if (!inicio || !fim) {
-            return res.status(400).json({ 
-                error: 'Parâmetros "inicio" e "fim" são obrigatórios.' 
+            return res.status(400).json({
+                error: 'Parâmetros "inicio" e "fim" são obrigatórios.'
             });
         }
 
@@ -38,8 +38,8 @@ async function gerarRelatorioController(req, res) {
         return res.status(200).json(resultado);
     } catch (error) {
         console.error('Erro ao gerar relatório:', error);
-        return res.status(500).json({ 
-            error: error.message || 'Erro ao gerar relatório' 
+        return res.status(500).json({
+            error: error.message || 'Erro ao gerar relatório'
         });
     }
 }
@@ -60,14 +60,14 @@ async function gerarRelatorioPostController(req, res) {
 
         // Validação básica
         if (!tipo) {
-            return res.status(400).json({ 
-                error: 'Campo "tipo" é obrigatório. Use "vendas", "produtos" ou "estoque".' 
+            return res.status(400).json({
+                error: 'Campo "tipo" é obrigatório. Use "vendas", "produtos" ou "estoque".'
             });
         }
 
         if (!inicio || !fim) {
-            return res.status(400).json({ 
-                error: 'Campos "inicio" e "fim" são obrigatórios.' 
+            return res.status(400).json({
+                error: 'Campos "inicio" e "fim" são obrigatórios.'
             });
         }
 
@@ -81,13 +81,13 @@ async function gerarRelatorioPostController(req, res) {
         return res.status(200).json(resultado);
     } catch (error) {
         console.error('Erro ao gerar relatório:', error);
-        return res.status(500).json({ 
-            error: error.message || 'Erro ao gerar relatório' 
+        return res.status(500).json({
+            error: error.message || 'Erro ao gerar relatório'
         });
     }
 }
 
-export {
+module.exports = {
     gerarRelatorioController,
     gerarRelatorioPostController
 };

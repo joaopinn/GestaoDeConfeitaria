@@ -28,5 +28,5 @@ app.use('/api/encomenda', encomendaRoutes);
 connectDB();
 
 app.listen(port, ()=> {[
-    console.log("\u{1F525} Servidor rodando na porta ${port}")
+    console.log(`\u{1F525} Servidor rodando na porta ${port}`)
 ]});
