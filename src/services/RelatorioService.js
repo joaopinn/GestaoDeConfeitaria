@@ -1,7 +1,24 @@
-import Relatorio from 'src/models/RelatórioModel.js'
-import mongoose from 'mongoose'
+const mongoose = require('mongoose');
 
-const { parseRange } = require('src/helpers/dataHelpers.js')
+const RelatorioModel = require('../models/RelatórioModel');
+const Encomenda = require('../models/EncomendaModel');
+const Produto = require('../models/CatalogoModel'); 
+
+
+const MovimentacaoEstoque = null;
+
+
+const parseRange = (inicio, fim) => {
+  // Se não vier data, pega do dia 01 até hoje
+  const hoje = new Date();
+  const diaPrimeiro = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+
+  return {
+    dataInicio: inicio ? new Date(inicio) : diaPrimeiro,
+    dataFim: fim ? new Date(fim) : hoje
+  };
+};
+
 async function gerarRelatorio({ tipo, inicio, fim, salvar = false }) {
   // valida e normaliza intervalo
   const { dataInicio, dataFim } = parseRange(inicio, fim);
@@ -36,7 +53,7 @@ async function gerarRelatorioVendas({ dataInicio, dataFim }) {
   // 1) total e contagem de encomendas (exclui CANCELADA)
   const matchEncomendas = {
     createdAt: { $gte: dataInicio, $lte: dataFim },
-    status: { $ne: 'CANCELADA' }
+    status: { $ne: 'CANCELADA' } // Verifica se seu Enum é MAIÚSCULO mesmo
   };
 
   const [resumo] = await Encomenda.aggregate([
@@ -62,12 +79,14 @@ async function gerarRelatorioVendas({ dataInicio, dataFim }) {
       $group: {
         _id: "$itens.produto",
         quantidadeVendida: { $sum: "$itens.quantidade" },
+        // Usa o preço salvo na hora da venda (snapshot)
         receitaGerada: { $sum: { $multiply: ["$itens.quantidade", "$itens.precoUnitarioSnapshot"] } }
       }
     },
     {
       $lookup: {
-        from: "produtos",
+
+        from: "catalogos",
         localField: "_id",
         foreignField: "_id",
         as: "produtoInfo"
@@ -96,7 +115,7 @@ async function gerarRelatorioVendas({ dataInicio, dataFim }) {
 }
 
 async function gerarRelatorioProdutos({ dataInicio, dataFim }) {
-  // Produtos criados ou atualizados no período (decida qual regra quiser; aqui usamos createdAt e updatedAt)
+  // Produtos criados ou atualizados no período
   const produtos = await Produto.find({
     $or: [
       { createdAt: { $gte: dataInicio, $lte: dataFim } },
@@ -104,16 +123,17 @@ async function gerarRelatorioProdutos({ dataInicio, dataFim }) {
     ]
   }).select("nome categoria precoVenda custoProducao createdAt updatedAt").lean();
 
-  // adiciona margem de lucro calculada (se não existir no objeto)
   const listaProdutos = produtos.map(p => {
+    // Proteção contra divisão por zero
     const margem = (p.precoVenda && p.custoProducao) ? ((p.precoVenda - p.custoProducao) / p.precoVenda) * 100 : 0;
+
     return {
       produtoId: p._id,
       nome: p.nome,
       categoria: p.categoria,
       precoVenda: p.precoVenda,
       custoProducao: p.custoProducao,
-      margemLucro: margem,
+      margemLucro: margem.toFixed(2),
       createdAt: p.createdAt,
       updatedAt: p.updatedAt
     };
@@ -128,7 +148,6 @@ async function gerarRelatorioProdutos({ dataInicio, dataFim }) {
 }
 
 async function gerarRelatorioEstoque({ dataInicio, dataFim }) {
-  // Parte 1: calcular saídas de estoque a partir das encomendas (itens vendidos)
   const matchEncomendas = {
     createdAt: { $gte: dataInicio, $lte: dataFim },
     status: { $ne: 'CANCELADA' }
@@ -145,7 +164,7 @@ async function gerarRelatorioEstoque({ dataInicio, dataFim }) {
     },
     {
       $lookup: {
-        from: "produtos",
+        from: "catalogos",
         localField: "_id",
         foreignField: "_id",
         as: "produtoInfo"
@@ -162,24 +181,26 @@ async function gerarRelatorioEstoque({ dataInicio, dataFim }) {
     { $sort: { quantidadeSaida: -1 } }
   ]);
 
-  // Parte 2: se existir MovimentacaoEstoque, trazer entradas/saídas registradas explicitamente
-  let movimentacoes = null;
+
+  let movimentacoes = [];
   if (MovimentacaoEstoque) {
-    movimentacoes = await MovimentacaoEstoque.find({
-      dataMovimentacao: { $gte: dataInicio, $lte: dataFim }
-    }).select("tipo produto quantidade createdAt descricao").lean();
+    try {
+      movimentacoes = await MovimentacaoEstoque.find({
+        dataMovimentacao: { $gte: dataInicio, $lte: dataFim }
+      }).select("tipo produto quantidade createdAt descricao").lean();
+    } catch (e) { console.log("Erro ao buscar movimentações"); }
   }
 
   return {
     periodo: { dataInicio, dataFim },
     tipo: "estoque",
     saidasPorProduto,
-    movimentacoes: movimentacoes || []
+    movimentacoes: movimentacoes
   };
 }
 
 /* ---------------------------
-   Função opcional de salvar histórico
+   Função de salvar histórico
    --------------------------- */
 async function salvarHistorico({ dataInicio, dataFim, resultado }) {
   if (!RelatorioModel) return;
@@ -194,7 +215,6 @@ async function salvarHistorico({ dataInicio, dataFim, resultado }) {
     await doc.save();
     return doc;
   } catch (err) {
-    // não deixar quebrar o fluxo do relatório se salvar falhar
     console.warn('Falha ao salvar relatório histórico:', err.message);
     return null;
   }

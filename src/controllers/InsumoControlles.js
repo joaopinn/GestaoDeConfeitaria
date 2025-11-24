@@ -1,32 +1,41 @@
-import { getListInsumos, getListInsumosByID, createInsumo, atualizarInsumoPorId, deletarInsumoPorId } from 'src/services/InsumoService.js'
-import { atualizarEstoqueDeInsumo } from '../services/InsumoService';
+const { 
+    getListInsumos, 
+    getListInsumosByID, 
+    createInsumo, 
+    atualizarInsumoPorId, 
+    deletarInsumoPorId,
+    atualizarEstoqueDeInsumo 
+} = require('../services/InsumoService');
 
 async function getListInsumosController(req, res) {
     try {
         const result = await getListInsumos();
-        return res.status(200).json(result) 
+        return res.status(200).json(result);
     } catch (error) {
-        res.status(500).json({ error: error.message})
+        return res.status(500).json({ error: error.message });
     }
 }
 
 async function getListInsumosByIdController(req, res) {
     try {
-        const result = await getListInsumosByID();
-        return res.status(200).json(result) 
+        
+        const { id } = req.params;
+        const result = await getListInsumosByID(id);
+        
+        return res.status(200).json(result);
     } catch (error) {
-        res.status(500).json({ error: error.message})
+        return res.status(500).json({ error: error.message });
     }
 }
 
-async function createInsumoController (req, res){
-     try {
+async function createInsumoController(req, res) {
+    try {
         const data = req.body;
-        const criarInsumo = await createInsumo(data);
+        const novoInsumo = await createInsumo(data); 
 
-        return res.status(201).json(criarInsumo);
+        return res.status(201).json(novoInsumo);
     } catch (error) {
-        res.status(500).json({ error: "Erro no banco de dados"})
+        return res.status(500).json({ error: "Erro no banco de dados: " + error.message });
     }
 }
 
@@ -34,56 +43,63 @@ async function atualizarInsumoPorIdController(req, res) {
     try {
         const { id } = req.params;
         const data = req.body;
-        const atualizacao = await atualizarInsumoPorId( id, data);
+        const atualizacao = await atualizarInsumoPorId(id, data);
 
-        if(!atualizacao){
-            res.status(404).json({ error: "Insumo não encontrado"})
-        }
-
-        return res.status(200).json(atualizacao);
-
-    } catch (error) {
-        res.status(500).json({ error: "Não foi possível atualizar por conta do banco"})
-    }
-}
-
-async function atualizarEstoqueDeInsumoController (req, res){
-    try {
-        const { id } = req.params;
-        const { quantidadeEmEstoque } = req.body; 
-        const atualizaoDoEstoque = await atualizarEstoqueDeInsumo( id, quantidadeEmEstoque);
-
-        if(!atualizacao){
-            res.status(404).json({ error: "Insumo não encontrado"})
-        }
-
-        return res.status(200).json(atualizaoDoEstoque);
-
-    } catch (error) {
-        res.status(500).json({ error: "Não foi possível atualizar o estoque por conta do banco"})
-    }
-}
-
-async function deletarInsumoPorIdController ( req, res ){
-    try {
-        const { id } = req.params
-        const deletarInsumo = await deletarInsumoPorId(id);
-
-        if (!deletado) {
+        if (!atualizacao) {
             return res.status(404).json({ error: "Insumo não encontrado" });
         }
 
-        return res.status(200).json({ message: "Insumo deletado com sucesso"})
+        return res.status(200).json(atualizacao);
     } catch (error) {
-        res.status(500).json({ error: "Erro ao apagar ao insumo por conta do banco"})
+        return res.status(500).json({ error: "Não foi possível atualizar: " + error.message });
     }
 }
 
-export {
+async function atualizarEstoqueDeInsumoController(req, res) {
+    try {
+        const { id } = req.params;
+        
+
+        const { estoqueAtual, quantidadeEmEstoque } = req.body;
+        
+        // Usa o que vier (prioridade para estoqueAtual)
+        const novaQtd = estoqueAtual !== undefined ? estoqueAtual : quantidadeEmEstoque;
+
+        const resultado = await atualizarEstoqueDeInsumo(id, novaQtd);
+
+        
+        if (!resultado) {
+            return res.status(404).json({ error: "Insumo não encontrado" });
+        }
+
+        return res.status(200).json(resultado);
+    } catch (error) {
+        return res.status(500).json({ error: "Erro ao atualizar estoque: " + error.message });
+    }
+}
+
+async function deletarInsumoPorIdController(req, res) {
+    try {
+        const { id } = req.params;
+        const resultado = await deletarInsumoPorId(id);
+
+        
+        if (!resultado) {
+            return res.status(404).json({ error: "Insumo não encontrado" });
+        }
+
+        return res.status(200).json({ message: "Insumo deletado com sucesso" });
+    } catch (error) {
+        return res.status(500).json({ error: "Erro ao apagar insumo: " + error.message });
+    }
+}
+
+
+module.exports = {
     getListInsumosByIdController,
     getListInsumosController,
     createInsumoController,
     atualizarInsumoPorIdController,
     atualizarEstoqueDeInsumoController,
     deletarInsumoPorIdController
-}
+};

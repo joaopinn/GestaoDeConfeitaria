@@ -1,4 +1,4 @@
-import { gerarRelatorio } from '../services/RelatorioService.js';
+const gerarRelatorio = require('../services/RelatorioService');
 
 /**
  * Controller para gerar relatório
