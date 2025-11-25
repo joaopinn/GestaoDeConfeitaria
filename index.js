@@ -7,6 +7,7 @@ const relatorioRoutes = require("./src/routes/RelatorioRoutes.js");
 const insumoRoutes = require('./src/routes/InsumoRoutes.js');
 const catalogoRoutes = require("./src/routes/CatalogoRoutes.js");
 const encomendaRoutes = require("./src/routes/EncomendaRoutes.js");
+const balancoRoutes = require('./src/routes/BalancoRoutes');
 
 const port = 3000;
 const app = express();
@@ -24,6 +25,7 @@ app.use('/api/relatorios', relatorioRoutes);
 app.use('/api/insumos', insumoRoutes);
 app.use('/api/catalogo', catalogoRoutes);
 app.use('/api/encomenda', encomendaRoutes);
+app.use('/api/balanco', balancoRoutes);
 
 connectDB();
 
