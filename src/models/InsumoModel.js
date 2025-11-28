@@ -11,7 +11,7 @@ const InsumoSchema = new mongoose.Schema({
   estoqueAtual: { type: Number, default: 0 },
   estoqueMinimo: { type: Number, default: 5 }, // Para avisar quando acabar
   
-  status: { type: String, enum: ['PENDENTE', 'ENTREGUE'], default: 'PENDENTE' }
+  status: { type: String, enum: ['ATIVO', 'INATIVO'], default: 'ATIVO' }
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 

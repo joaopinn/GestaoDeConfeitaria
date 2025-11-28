@@ -3,7 +3,7 @@ const BalancoService = require('../services/BalancoService');
 const BalancoController = {
 
     //Get 
-    obterDadosDashboard: async () => {
+    obterDadosDashboard: async (req, res) => {
         try {
             
             // Pegando mês e ano da URL, Se nao possuir utiliza a data de hoje
@@ -14,11 +14,11 @@ const BalancoController = {
             // Chama o service 
             const dados = await BalancoService.gerarBalanco(mes, ano);
             
-            return resizeBy.json(dados);
+            return res.json(dados);
 
         } catch (error) {
             console.error("Erro no Balanço: ", error);
-            return resizeBy.status(500).json({error: 'Erro ao gerar balanço financeiro'});
+            return res.status(500).json({error: 'Erro ao gerar balanço financeiro'});
         }
     }
 };

@@ -23,11 +23,10 @@ const ProdutoSchema = new mongoose.Schema({
   
   custoProducao: { type: Number, default: 0 },
 
-  // --- ADICIONADO PARA ATENDER O REQUISITO DO COLEGA ---
   status: { 
     type: String, 
-    enum: ['PENDENTE', 'ENTREGUE'], 
-    default: 'PENDENTE' 
+    enum: ['ATIVO', 'INATIVO'], 
+    default: 'ATIVO' 
   }
 
 }, {
@@ -60,7 +59,6 @@ ProdutoSchema.methods.calcularCusto = async function () {
     }
   });
 
-  // CORRIGIDO: Removido o número 6 que estava aqui
   this.custoProducao = parseFloat(custoTotal.toFixed(2));
 
   return this.save(); 
@@ -73,6 +71,4 @@ ProdutoSchema.virtual('margemLucro').get(function() {
   return ((this.precoVenda - this.custoProducao) / this.precoVenda) * 100;
 });
 
-// OBSERVAÇÃO: O nome do model aqui é 'Produto'. 
-// Certifique-se que no EncomendaModel o ref seja: ref: 'Produto'
 module.exports = mongoose.model('Produto', ProdutoSchema);
