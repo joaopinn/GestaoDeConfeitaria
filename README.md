@@ -149,10 +149,10 @@ Inteligência financeira.
 
 ## 🎓 Integrantes (Discentes)
 
-<table> <tr> <td align="center"> <a href="https://www.google.com/search?q=https://github.com/CarlosH-Santiago"> <img src="https://www.google.com/search?q=https://avatars.githubusercontent.com/u/CarlosH-Santiago" width="100px;" alt="Foto do Carlos Henrique"/>
+<table> <tr> <td align="center"> <a href="https://www.google.com/search?q=https://github.com/CarlosH-Santiago"> <img src="img/Carlos_H.jpeg" width="100px;" alt="Foto do Carlos Henrique"/>
 
 
-<sub> <b>Carlos Henrique de S S Santiago</b> </sub> </a> </td> <td align="center"> <a href="https://www.google.com/search?q=https://github.com/joaopin"> <img src="https://www.google.com/search?q=https://avatars.githubusercontent.com/u/joaopin" width="100px;" alt="Foto do João Guilherme"/>
+<sub> <b>Carlos Henrique de S S Santiago</b> </sub> </a> </td> <td align="center"> <a href="https://www.google.com/search?q=https://github.com/joaopin"> <img src="img/Joao_pin.jpeg" width="100px;" alt="Foto do João Guilherme"/>
 
 
 <sub> <b>João Guilherme P Gonçcalves</b> </sub> </a> </td> </tr> </table>
