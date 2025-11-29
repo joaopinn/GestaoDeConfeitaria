@@ -102,6 +102,8 @@ O servidor estará rodando em: `http://localhost:3000`
 
 ## 📚 Documentação da API
 
+Para detalhes completos, exemplos de requests e respostas, consulte `docs/API-Rotas.md`.
+
 ### 🥛 Módulo: Insumos (Estoque)
 
 Gerencia a matéria-prima (ex: Farinha, Leite, Ovos).

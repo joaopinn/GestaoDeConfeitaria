@@ -12,6 +12,8 @@ const balancoRoutes = require('./src/routes/BalancoRoutes');
 const port = 3000;
 const app = express();
 
+
+
 // Configurações
 app.use(express.json());
 
