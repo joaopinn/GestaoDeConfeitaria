@@ -15,6 +15,12 @@ const app = express();
 
 
 // Configurações
+app.use(cors({
+    origin: '*', // Permite qualquer site acessar (mais fácil para desenvolvimento)
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
 
 // Rota teste
