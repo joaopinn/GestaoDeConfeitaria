@@ -32,7 +32,7 @@ app.get( '/', (req, res)=> {
 app.use('/api/relatorios', relatorioRoutes);
 app.use('/api/insumos', insumoRoutes);
 app.use('/api/catalogo', catalogoRoutes);
-app.use('/api/encomenda', encomendaRoutes);
+app.use('/api/encomendas', encomendaRoutes);
 app.use('/api/balanco', balancoRoutes);
 
 connectDB();
